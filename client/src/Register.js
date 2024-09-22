@@ -26,7 +26,7 @@ const Register = ({ isLogin, toggleForm }) => {
       alert("Logged in with Google!");
       navigate("/home");
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       setError(error.message);
     }
   };
