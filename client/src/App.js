@@ -1,10 +1,10 @@
 import React from "react";
-import "./App.css";
-import "./index.css";
+// import "./App.css";
+// import "./index.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { getDatabase, ref, set } from "firebase/database";
 import { app } from "./firebaseConfig";
-import Auth from "./Auth";
+import Auth from "./Components/Auth";
 import Home from "./Home";
 const db = getDatabase(app);
 
