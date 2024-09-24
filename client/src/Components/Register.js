@@ -118,7 +118,7 @@ const Register = ({ isLogin, toggleForm }) => {
         </button>
         <p className="mt-4">
           {isLogin ? "Don't have an account?" : "Already Registered"}
-          <button onClick={toggleForm} className="text-blue-500">
+          <button onClick={toggleForm} className=" w-50">
             {isLogin ? "Register" : "Log In"}
           </button>
         </p>
