@@ -116,9 +116,10 @@ const Register = ({ isLogin, toggleForm }) => {
         >
           Sign in with GitHub
         </button>
-        <p className="mt-4">
-          {isLogin ? "Don't have an account?" : "Already Registered"}
-          <button onClick={toggleForm} className=" w-50">
+        
+        <p className="mt-4 w-[110%]">
+          {isLogin ? "Don't have an account?" : "Already Registered?"}
+          <button onClick={toggleForm} className="text-blue-500 w-[25%]">
             {isLogin ? "Register" : "Log In"}
           </button>
         </p>
