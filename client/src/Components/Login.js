@@ -22,7 +22,7 @@ const Login = ({isLogin,toggleForm}) => {
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100 font-sans">
       <h2 className="text-3xl font-bold mb-4">Log In</h2>
       {error && <p>{error}</p>}
       <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-80 ">
@@ -31,7 +31,7 @@ const Login = ({isLogin,toggleForm}) => {
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border border-gray-300 p-2 mb-4 w-full rounded"
+          className="border border-gray-300 p-2 mb-4 w-full rounded text-black"
           required
         />
         <input
@@ -39,7 +39,7 @@ const Login = ({isLogin,toggleForm}) => {
           placeholder="Enter your password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border border-gray-300 p-2 mb-4 w-full rounded"
+          className="border border-gray-300 p-2 mb-4 w-full rounded text-black"
           required
         />
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded w-full">Submit</button>
