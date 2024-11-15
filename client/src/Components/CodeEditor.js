@@ -1,8 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import Editor from "@monaco-editor/react";
-import axios from "axios";
 
 const socket = io("http://localhost:5001");
 
@@ -12,30 +10,33 @@ const CodeEditor = ({ setOutput }) => {
   const [language, setLanguage] = useState("javascript");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Handle code change and emit to Socket.io
   const handleCodeChange = (newCode) => {
     setCode(newCode);
     socket.emit("code-change", newCode);
   };
 
+  // Toggle theme between dark and light
   const toggleTheme = () => {
     setTheme((prev) => (prev === "vs-dark" ? "light" : "vs-dark"));
   };
-  const runCode=async()=>{
-    setIsLoading(true);
-    console.log(code);
-    try{
-      const response=await axios.post('http://localhost:5001/compile',{code});
-      setOutput(response.data.output);
 
-    }
-    catch(error){
-      setOutput(error.response? error.response.data.error : 'Error running code')
-    }
-    finally{
+  // Manual JavaScript Compiler
+  const runCode = () => {
+    setIsLoading(true);
+    try {
+      // Use eval to execute the code and capture the output
+      const result = eval(code);
+      setOutput(result !== undefined ? result.toString() : "No output");
+    } catch (error) {
+      // Handle syntax or runtime errors
+      setOutput(`Error: ${error.message}`);
+    } finally {
       setIsLoading(false);
     }
-  }
+  };
 
+  // Socket.io setup for real-time code synchronization
   useEffect(() => {
     socket.on("receive-code", (newCode) => {
       setCode(newCode);
@@ -44,85 +45,6 @@ const CodeEditor = ({ setOutput }) => {
       socket.off("receive-code");
     };
   }, []);
-
-  // Step 1: Submitting the code
-  // const runCode = async () => {
-  //   setIsLoading(true);
-
-  //   // Set Judge0 options for the code submission
-  //   const submitOptions = {
-  //     method: "POST",
-  //     url: "https://judge0-ce.p.rapidapi.com/submissions",
-  //     headers: {
-  //       "x-rapidapi-key": "a7f4ee7b53msh8cd1f1c955f02a3p1dcb9bjsne3ec86ef8cd2", // Replace with your own key
-  //       "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
-  //       "Content-Type": "application/json",
-  //     },
-  //     data: {
-  //       language_id: 63, // JavaScript
-  //       source_code: code,
-  //       stdin: "", // No input needed
-  //     },
-  //   };
-
-  //   try {
-  //     // Submitting the code
-  //     const submitResponse = await axios.request(submitOptions);
-
-  //     const submissionToken = submitResponse.data.token;
-
-  //     // Step 2: Polling to get the result
-  //     await pollJudge0(submissionToken);
-  //   } catch (error) {
-  //     console.error("Error during code submission:", error);
-  //     setOutput("Error running code.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // Step 2: Polling for code result
-  // const pollJudge0 = async (token) => {
-  //   const pollOptions = {
-  //     method: "GET",
-  //     url: `https://judge0-ce.p.rapidapi.com/submissions/${token}`,
-  //     headers: {
-  //       "x-rapidapi-key": "a7f4ee7b53msh8cd1f1c955f02a3p1dcb9bjsne3ec86ef8cd2", // Replace with your own key
-  //       "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
-  //     },
-  //   };
-
-  //   try {
-  //     let result;
-  //     let statusDescription;
-
-  //     // Poll until we get a result
-  //     do {
-  //       const pollResponse = await axios.request(pollOptions);
-  //       statusDescription = pollResponse.data.status.description;
-  //       console.log(pollResponse);
-
-  //       if (pollResponse.data.status.id === 3) {
-  //         result = pollResponse.data.stdout || "No Output.";
-  //       } else if (pollResponse.data.status.id === 6) {
-  //         result = pollResponse.data.stderr || "Runtime Error.";
-  //       } else if (pollResponse.data.status.id === 11) {
-  //         result = pollResponse.data.compile_output || "Compilation Error.";
-  //       }
-
-  //       // Poll again if still processing
-  //       if (statusDescription === "In Queue" || statusDescription === "Processing") {
-  //         await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait for 1 second before polling again
-  //       }
-  //     } while (statusDescription === "In Queue" || statusDescription === "Processing");
-
-  //     // Step 3: Display the result in output
-  //     setOutput(result);
-  //   } catch (error) {
-  //     console.error("Error during polling:", error);
-  //     setOutput("Error fetching code result.");
-  //   }
-  // };
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 p-4 rounded-lg shadow-lg">

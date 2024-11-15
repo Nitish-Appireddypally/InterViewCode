@@ -8,7 +8,7 @@ const Home = () => {
 
   const handleLogout = () => {
     // Handle Firebase logout (you can integrate Firebase logout functionality here)
-    navigate("/auth");
+    navigate("/");
   };
 
   return (
