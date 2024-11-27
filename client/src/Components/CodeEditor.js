@@ -1,19 +1,19 @@
+
+
 import React, { useState, useEffect } from "react";
-import { io } from "socket.io-client";
 import Editor from "@monaco-editor/react";
 
-const socket = io("http://localhost:5001");
-
-const CodeEditor = ({ setOutput }) => {
-  const [code, setCode] = useState("// Start coding...");
+const CodeEditor = ({ code, onCodeChange, setOutput, socket }) => {
   const [theme, setTheme] = useState("vs-dark");
-  const [language, setLanguage] = useState("javascript");
   const [isLoading, setIsLoading] = useState(false);
 
   // Handle code change and emit to Socket.io
   const handleCodeChange = (newCode) => {
-    setCode(newCode);
-    socket.emit("code-change", newCode);
+    onCodeChange(newCode); // Update code in the parent (Room component)
+    // Emit the code change to the server
+    if (socket) {
+      socket.emit("code-change", newCode); // Emit new code to the server
+    }
   };
 
   // Toggle theme between dark and light
@@ -25,32 +25,33 @@ const CodeEditor = ({ setOutput }) => {
   const runCode = () => {
     setIsLoading(true);
     try {
-      // Use eval to execute the code and capture the output
       const result = eval(code);
       setOutput(result !== undefined ? result.toString() : "No output");
     } catch (error) {
-      // Handle syntax or runtime errors
       setOutput(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Socket.io setup for real-time code synchronization
+  // Listen for updates to code from the server
   useEffect(() => {
-    socket.on("receive-code", (newCode) => {
-      setCode(newCode);
-    });
+    if (socket) {
+      socket.on("receive-code", (newCode) => {
+        // Update the code in the editor when other users change it
+        onCodeChange(newCode);
+      });
+    }
     return () => {
-      socket.off("receive-code");
+      if (socket) {
+        socket.off("receive-code");
+      }
     };
-  }, []);
+  }, [socket, onCodeChange]);
 
   return (
     <div className="flex flex-col h-screen bg-gray-900 p-4 rounded-lg shadow-lg">
-      <h1 className="text-2xl text-white mb-4 text-center">
-        Real-Time Code Editor
-      </h1>
+      <h1 className="text-2xl text-white mb-4 text-center">Real-Time Code Editor</h1>
       <div className="flex mb-4 justify-between">
         <button
           onClick={toggleTheme}
@@ -88,3 +89,4 @@ const CodeEditor = ({ setOutput }) => {
 };
 
 export default CodeEditor;
+
