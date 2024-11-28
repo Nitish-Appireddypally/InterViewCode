@@ -14,10 +14,21 @@ const Room = () => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:5001", {
+    const socketURL =
+    window.location.hostname === "localhost"
+      ? "ws://localhost:5001"
+      : "ws://10.10.44.18:5001";
+
+      const newSocket = io(socketURL, {
       transports: ["websocket", "polling"],  // Specify WebSocket first, and polling as fallback
     });
     setSocket(newSocket);
+
+    // Debugging WebSocket connection error
+    newSocket.on("connect_error", (err) => {
+      console.error("Connection failed", err);
+    });
+
     newSocket.emit("join-room", roomId);
 
     newSocket.on("participants", (participants) => {

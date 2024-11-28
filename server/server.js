@@ -1,36 +1,36 @@
-
-
-
-
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const cors = require('cors'); // Import cors module
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
+const port = 5001;
+
+// CORS middleware to allow frontend URLs (both local and over IP)
+const corsOptions = {
+  // origin: ['http://localhost:3000', 'http://10.10.44.18:3000'],  // Allow both frontend URLs
+  origin:"*",
+  methods: ['GET', 'POST'],
+  credentials: true,
+};
+
+// Use CORS middleware for Express
+app.use(cors(corsOptions));
+
+// Set up Socket.io with CORS support for multiple origins
 const io = socketIo(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-  transports: ['websocket', 'polling'],  // Ensure WebSocket is enabled
+  cors: corsOptions,
+  transports: ['websocket', 'polling'],  // Ensure WebSocket and Polling are enabled
+  upgrade: true,  // Ensure the connection is upgraded to WebSocket
 });
 
-
-// Use CORS middleware to allow frontend requests
-app.use(cors({
-  origin: "http://localhost:3000", // Allow your frontend URL
-  methods: ["GET", "POST"],
-}));
-
-// Serve static files (e.g., if you want to serve frontend assets later)
+// Serve static files (if needed)
 app.use(express.static('public'));
 
 // Handle socket.io connections
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('A user connected',socket.id);
 
   // When a user joins a room
   socket.on('join-room', (roomId) => {
@@ -55,9 +55,10 @@ io.on('connection', (socket) => {
 });
 
 // Start the server
-server.listen(5001, () => {
-  console.log('Server running on port 5001');
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
+
 
 
 
